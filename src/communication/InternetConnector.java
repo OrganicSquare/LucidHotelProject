@@ -115,26 +115,33 @@ public class InternetConnector {
 	}
 	public static Map<Integer, Map<String, Object>> decodeUserPositions() {
 		Map<Integer, Map<String, Object>> ComputationResponse = new HashMap<Integer, Map<String, Object>>();
-		if(!JSONRawMain.equals("") && !JSONRawMain.equals("true")){
-		Object obj=JSONValue.parse(JSONRawMain);
-		JSONArray array=(JSONArray)obj;
-		for (int i = 0; i< array.size(); i++){
-			Map<String, Object> UserDetails = new HashMap<String, Object>();
-			JSONObject playerDetails=(JSONObject)array.get(i);			
-			try {
-				UserDetails.put("uId", Integer.parseInt(playerDetails.get("id").toString()));
-				UserDetails.put("uName", playerDetails.get("userName").toString());
-				UserDetails.put("uSkin", playerDetails.get("skin").toString());
-				UserDetails.put("yPos", Float.parseFloat(playerDetails.get("yPos").toString()));
-				UserDetails.put("xPos", Float.parseFloat(playerDetails.get("xPos").toString()));
-				UserDetails.put("zPos", Float.parseFloat(playerDetails.get("zPos").toString()));
-				UserDetails.put("rotY", Float.parseFloat(playerDetails.get("rotY").toString()));
-				UserDetails.put("isMoving", Boolean.parseBoolean(playerDetails.get("yPos").toString()));
-			} catch (Exception ex) {
-				System.out.println("Error converting the user positions w/ data : " + JSONRawMain);				
+		String JSONRaw = JSONRawMain;
+		if(JSONRaw.trim().equals("false")){
+			System.out.println("Warning: There are no users currently online");
+			
+			return ComputationResponse;
+		} else {
+			if(!JSONRaw.equals("") && !JSONRaw.equals("true")){
+			Object obj=JSONValue.parse(JSONRaw);
+			JSONArray array=(JSONArray)obj;
+				for (int i = 0; i< array.size(); i++){
+					Map<String, Object> UserDetails = new HashMap<String, Object>();
+					JSONObject playerDetails=(JSONObject)array.get(i);			
+					try {
+						UserDetails.put("uId", Integer.parseInt(playerDetails.get("id").toString()));
+						UserDetails.put("uName", playerDetails.get("userName").toString());
+						UserDetails.put("uSkin", playerDetails.get("skin").toString());
+						UserDetails.put("yPos", Float.parseFloat(playerDetails.get("yPos").toString()));
+						UserDetails.put("xPos", Float.parseFloat(playerDetails.get("xPos").toString()));
+						UserDetails.put("zPos", Float.parseFloat(playerDetails.get("zPos").toString()));
+						UserDetails.put("rotY", Float.parseFloat(playerDetails.get("rotY").toString()));
+						UserDetails.put("isMoving", Boolean.parseBoolean(playerDetails.get("yPos").toString()));
+					} catch (Exception ex) {
+						System.out.println("Error converting the user positions w/ data : " + JSONRawMain);				
+					}
+					ComputationResponse.put(i, UserDetails);
+				}	
 			}
-			ComputationResponse.put(i, UserDetails);
-		}	
 		}
 		
 		return ComputationResponse;
