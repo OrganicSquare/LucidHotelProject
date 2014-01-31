@@ -7,6 +7,9 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +33,7 @@ public class Main{
 	static final int SYNC_DELAY_MAX = 100;
 	// User data
 	static Map<String, Object> userInfo;
-	static boolean loginSuccessful = false;
+	static boolean loginSuccessful = false, windowClosed = false;
 	// Multiplayer data
 	static Map<Integer, Map<String, Object>> otherUserInfo = null;
 	
@@ -42,8 +45,17 @@ public class Main{
 	static JFrame frame = new JFrame("Multiplayer");
 	static Canvas lwjglCanvas = new Canvas();
 	static JPanel mainMenu = new JPanel();
+	static boolean initialisedUserInfo = false;
 	
-	
+	static WindowListener listener = new WindowAdapter() {
+		public void windowClosing(WindowEvent w) {
+			windowClosed = true;
+			if(loginSuccessful){
+				communication.InternetConnector.logoutUser((int)userInfo.get("uId"));
+			}
+			System.exit(0);
+		}
+	};
 	
 	public static void main(String args[]){
 		initWindow();
@@ -56,17 +68,20 @@ public class Main{
 		Camera cam = new Camera(70,(float)WIDTH/(float)HEIGHT,0.3f,1000);
 		cam.setZ(10);
 		cam.setY(1);
-		animation[0] = new Animation("Animations/Walking Man","Walking Man",1,20);
-		animation[1] = new Animation("Animations/Walking Man","Walking Man",1,20);
+		animation[0] = new Animation("Animations/Walking Man","Walking Man",1,38);
+		animation[1] = new Animation("Animations/Walking Man","Walking Man",1,38);
 		
-		
-		while(!Display.isCloseRequested()){
+		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
+				if(!initialisedUserInfo){
+					initialisedUserInfo = true;
+					System.out.println(userInfo.get("uId"));
+				}
 				if(SYNC_DELAY > SYNC_DELAY_MAX) {
 					
 					// Download other user data
-					 otherUserInfo = InternetConnector.decodeUserPositions();
-					System.out.println(otherUserInfo.get(0));
+					otherUserInfo = InternetConnector.decodeUserPositions();
+					//System.out.println(otherUserInfo);
 					// Load in the other users data 				
 					for(int i = 0; i < otherUserInfo.size(); i++){
 						Map<String, Object> userInfo = otherUserInfo.get(i);
@@ -75,9 +90,9 @@ public class Main{
 					}
 					
 					// Set up download for next time
-					InternetConnector.downloadAllUserPositions((int)userInfo.get("uId"));
+					//InternetConnector.downloadAllUserPositions((int)userInfo.get("uId"));
 					// Send user data
-					InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
+					//InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
 					
 					// Will reset the delay
 					SYNC_DELAY = 0;
@@ -187,7 +202,7 @@ public class Main{
 		initMenu();
 		frame.setVisible(true);
 		initDisplay();
-		
+		frame.addWindowListener(listener);
 	}
 	public static void initDisplay(){
 		try{
@@ -205,7 +220,6 @@ public class Main{
 		frame.add(menu);
 	}
 	public static void cleanUp() {
-		//communication.InternetConnector.logoutUser(USERID);
 		Display.destroy();
 		Keyboard.destroy();
 		Mouse.destroy();
