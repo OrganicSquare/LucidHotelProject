@@ -7,6 +7,9 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -28,22 +31,34 @@ public class Main{
 	static final int MAX_PLAYERS = 8;
 	static int SYNC_DELAY = 0;
 	static final int SYNC_DELAY_MAX = 100;
-	// User data
+	
 	static Map<String, Object> userInfo;
-	static boolean loginSuccessful = false;
-	// Multiplayer data
+	static boolean loginSuccessful = false, windowClosed = false;
+	
 	static Map<Integer, Map<String, Object>> otherUserInfo = null;
 	
+	static int USERID;
+	static float userxPos, useryPos, userzPos, userxRot, useryRot, userzRot;
 	
 	static Animation animation[] = new Animation[16];
 	static Player player[] = new Player[MAX_PLAYERS];
+	static Player userPlayer;
 	static int[] playerIntToID;
 	
 	static JFrame frame = new JFrame("Multiplayer");
 	static Canvas lwjglCanvas = new Canvas();
 	static JPanel mainMenu = new JPanel();
+	static boolean initialisedUserInfo = false;
 	
-	
+	static WindowListener listener = new WindowAdapter() {
+		public void windowClosing(WindowEvent w) {
+			windowClosed = true;
+			if(loginSuccessful){
+				communication.InternetConnector.logoutUser((int)userInfo.get("uId"));
+			}
+			System.exit(0);
+		}
+	};
 	
 	public static void main(String args[]){
 		initWindow();
@@ -56,18 +71,20 @@ public class Main{
 		Camera cam = new Camera(70,(float)WIDTH/(float)HEIGHT,0.3f,1000);
 		cam.setZ(10);
 		cam.setY(1);
-		animation[0] = new Animation("Animations/Walking Man","Walking Man",1,20);
-		animation[1] = new Animation("Animations/Walking Man","Walking Man",1,20);
+		animation[0] = new Animation("Animations/Walking Man","Walking Man",1,38);
+		animation[1] = new Animation("Animations/Walking Man","Walking Man",1,38);
 		
-		
-		while(!Display.isCloseRequested()){
+		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
+				if(!initialisedUserInfo){
+					initUserInfo();
+				}
 				if(SYNC_DELAY > SYNC_DELAY_MAX) {
 					
 					// Download other user data
-					 otherUserInfo = InternetConnector.decodeUserPositions();
-					System.out.println(otherUserInfo.get(0));
-					// Load in the other users data 				
+					otherUserInfo = InternetConnector.decodeUserPositions();
+					System.out.println(otherUserInfo);
+					// Load in the other users data
 					for(int i = 0; i < otherUserInfo.size(); i++){
 						Map<String, Object> userInfo = otherUserInfo.get(i);
 						player[i] = new Player(userInfo);
@@ -75,9 +92,9 @@ public class Main{
 					}
 					
 					// Set up download for next time
-					InternetConnector.downloadAllUserPositions((int)userInfo.get("uId"));
+					//InternetConnector.downloadAllUserPositions((int)userInfo.get("uId"));
 					// Send user data
-					InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
+					//InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
 					
 					// Will reset the delay
 					SYNC_DELAY = 0;
@@ -86,7 +103,11 @@ public class Main{
 				userInput(cam);
 				glClear(GL_COLOR_BUFFER_BIT);
 				glClear(GL_DEPTH_BUFFER_BIT);
+				glPushMatrix();
+				glRotatef(useryRot,0,1,0);
+				glTranslatef(userxPos,useryPos,userzPos);
 				animation[0].animate(0.7f);
+				glPopMatrix();
 				glLoadIdentity();
 				cam.useCam();
 				drawAxis();
@@ -96,7 +117,10 @@ public class Main{
 		}
 	}
 	
-	
+	public static void initUserInfo(){
+		initialisedUserInfo = true;
+		userPlayer = new Player(userInfo);
+	}
 	
 	public static void userInput(Camera cam){
 		float speed = 0.1f;
@@ -187,7 +211,7 @@ public class Main{
 		initMenu();
 		frame.setVisible(true);
 		initDisplay();
-		
+		frame.addWindowListener(listener);
 	}
 	public static void initDisplay(){
 		try{
@@ -205,7 +229,6 @@ public class Main{
 		frame.add(menu);
 	}
 	public static void cleanUp() {
-		//communication.InternetConnector.logoutUser(USERID);
 		Display.destroy();
 		Keyboard.destroy();
 		Mouse.destroy();

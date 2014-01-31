@@ -11,7 +11,8 @@ public class Player {
 	int user_id;
 	float xPos, yPos, zPos, xRot, yRot, zRot;
 	boolean isMoving;
-	public Player(Map<String, Object> userInfo){		
+	public Player(Map<String, Object> userInfo){
+		user_id = (int)userInfo.get("uId");
 		xPos = (float)userInfo.get("xPos");
 		yPos = (float)userInfo.get("yPos");
 		zPos = (float)userInfo.get("zPos");
