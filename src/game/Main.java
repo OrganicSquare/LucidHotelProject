@@ -31,15 +31,18 @@ public class Main{
 	static final int MAX_PLAYERS = 8;
 	static int SYNC_DELAY = 0;
 	static final int SYNC_DELAY_MAX = 100;
-	// User data
+	
 	static Map<String, Object> userInfo;
 	static boolean loginSuccessful = false, windowClosed = false;
-	// Multiplayer data
+	
 	static Map<Integer, Map<String, Object>> otherUserInfo = null;
 	
+	static int USERID;
+	static float userxPos, useryPos, userzPos, userxRot, useryRot, userzRot;
 	
 	static Animation animation[] = new Animation[16];
 	static Player player[] = new Player[MAX_PLAYERS];
+	static Player userPlayer;
 	static int[] playerIntToID;
 	
 	static JFrame frame = new JFrame("Multiplayer");
@@ -74,15 +77,14 @@ public class Main{
 		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
 				if(!initialisedUserInfo){
-					initialisedUserInfo = true;
-					System.out.println(userInfo.get("uId"));
+					initUserInfo();
 				}
 				if(SYNC_DELAY > SYNC_DELAY_MAX) {
 					
 					// Download other user data
 					otherUserInfo = InternetConnector.decodeUserPositions();
-					//System.out.println(otherUserInfo);
-					// Load in the other users data 				
+					System.out.println(otherUserInfo);
+					// Load in the other users data
 					for(int i = 0; i < otherUserInfo.size(); i++){
 						Map<String, Object> userInfo = otherUserInfo.get(i);
 						player[i] = new Player(userInfo);
@@ -101,7 +103,11 @@ public class Main{
 				userInput(cam);
 				glClear(GL_COLOR_BUFFER_BIT);
 				glClear(GL_DEPTH_BUFFER_BIT);
+				glPushMatrix();
+				glRotatef(useryRot,0,1,0);
+				glTranslatef(userxPos,useryPos,userzPos);
 				animation[0].animate(0.7f);
+				glPopMatrix();
 				glLoadIdentity();
 				cam.useCam();
 				drawAxis();
@@ -111,7 +117,10 @@ public class Main{
 		}
 	}
 	
-	
+	public static void initUserInfo(){
+		initialisedUserInfo = true;
+		userPlayer = new Player(userInfo);
+	}
 	
 	public static void userInput(Camera cam){
 		float speed = 0.1f;
