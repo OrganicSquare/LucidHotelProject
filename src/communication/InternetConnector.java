@@ -39,12 +39,12 @@ import org.apache.http.concurrent.FutureCallback;
 import communication.Util;
 import java.util.Timer;
 import java.util.TimerTask;
-// FROM MODELLOADER
+
 public class InternetConnector {
 	private final static String WEB_SERVER = "http://benallen.info/projects/GameJJB/bin/dataHandler.php";
 	private static Integer WEB_STATUS = 0; 
 	private final static int ITERATION_NUMBER = 1000;
-    public static String JSONRawMain;
+    public static String[] JSONRawMain;
 	 static Timer timer;
     
 	public static void main(String args[])throws IOException{
@@ -111,11 +111,11 @@ public class InternetConnector {
 		String JSONRaw = null;		
 		urlName = new String[]{"target", "uId"};
 		urlAttribute = new String[]{"findOnlinePlayers",Integer.toString(uId)};		
-		excutePostAsync(urlName,urlAttribute, false);
+		excutePostAsync(urlName,urlAttribute, 1);
 	}
 	public static Map<Integer, Map<String, Object>> decodeUserPositions() {
 		Map<Integer, Map<String, Object>> ComputationResponse = new HashMap<Integer, Map<String, Object>>();
-		String JSONRaw = JSONRawMain;
+		String JSONRaw = JSONRawMain[0];
 		if(JSONRaw.trim().equals("false")){
 			System.out.println("Warning: There are no users currently online");
 			
@@ -137,7 +137,7 @@ public class InternetConnector {
 						UserDetails.put("rotY", Float.parseFloat(playerDetails.get("rotY").toString()));
 						UserDetails.put("isMoving", Boolean.parseBoolean(playerDetails.get("yPos").toString()));
 					} catch (Exception ex) {
-						System.out.println("Error converting the user positions w/ data : " + JSONRawMain);				
+						System.out.println("Error converting the user positions w/ data : " + JSONRaw);				
 					}
 					ComputationResponse.put(i, UserDetails);
 				}	
@@ -162,14 +162,14 @@ public class InternetConnector {
 		return ReturnResponse;
 	}
 	public static void downloadUserInformation(String userName){	
-		JSONRawMain = "";
-		excutePostAsync(new String[]{"target","userName"}, new String[]{"userInformation",userName}, false);		
+		JSONRawMain[0] = "";
+		excutePostAsync(new String[]{"target","userName"}, new String[]{"userInformation",userName}, 1);		
 	}	
 	public static Map<String, Object> decodeUserInformation(){
 		Map<String, Object> ComputationResponse = new HashMap<String, Object>();
-		String JSONRaw = JSONRawMain;
+		String JSONRaw = JSONRawMain[0];
 		Object obj=JSONValue.parse(JSONRaw);
-		JSONRawMain = "";
+		JSONRawMain[0] = "";
 		JSONArray array=(JSONArray)obj;
 		JSONObject playerDetails=(JSONObject)array.get(0);			
 		
@@ -189,7 +189,7 @@ public class InternetConnector {
 		urlName = new String[]{"target","uId","xPos","yPos","zPos","rotY","isMoving"};
 		urlAttribute = new String[]{"positionUpdater",String.valueOf(uId),String.valueOf(positionData[0]),String.valueOf(positionData[1]),String.valueOf(positionData[2]),String.valueOf(positionData[3]),String.valueOf(positionData[4])};
 		
-		excutePostAsync(urlName,urlAttribute, true);
+		excutePostAsync(urlName,urlAttribute, 0);
 				
 			
 	}
@@ -290,7 +290,7 @@ public class InternetConnector {
 	    * @return boolean Returns a JSON array of users digest and salt
 	    */
 	public static void findUser(String username) {
-		excutePostAsync(new String[]{"target","uName"}, new String[]{"findUser",username}, false);	
+		excutePostAsync(new String[]{"target","uName"}, new String[]{"findUser",username}, 1);	
 	}
 	 /**
 	    * Authenticates the user with a given login and password
@@ -304,8 +304,8 @@ public class InternetConnector {
 		String JSONRaw = null;
 		Util.logC("=== isLoginOK");
 		boolean ComputationResponse = false;
-		JSONRaw = JSONRawMain;
-		JSONRawMain = "";
+		JSONRaw = JSONRawMain[0];
+		JSONRawMain[0] = "";
 		if(JSONRaw.length() < 200 && !JSONRaw.trim().equals("[false]")){
 			try {		
 				Object obj=JSONValue.parse(JSONRaw);
@@ -414,7 +414,7 @@ public class InternetConnector {
 
 	    */
 
-	public static String excutePostAsync(String[] urlName, String[] urlAttribute, final Boolean doPassive)
+	public static String excutePostAsync(String[] urlName, String[] urlAttribute, final int responseKey)
 	  {
 		URIBuilder builder = new URIBuilder();
 		builder.setScheme("http").setHost("benallen.info").setPath("/projects/GameJJB/bin/dataHandler.php");
@@ -436,7 +436,7 @@ public class InternetConnector {
 		        System.out.println("fail");
 		    }
 		    public void completed (final Content content) {
-		        if(!doPassive){JSONRawMain = content.asString();}
+		        JSONRawMain[responseKey] = content.asString();
 		    }
 
 		    public void cancelled () {
