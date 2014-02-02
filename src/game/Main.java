@@ -54,7 +54,7 @@ public class Main{
 		public void windowClosing(WindowEvent w) {
 			windowClosed = true;
 			if(loginSuccessful){
-				communication.InternetConnector.logoutUser((int)userInfo.get("uId"));
+				communication.InternetConnector.logoutUser((Integer)userInfo.get("uId"));
 			}
 			System.exit(0);
 		}
@@ -92,7 +92,7 @@ public class Main{
 					}
 					
 					// Set up download for next time
-					InternetConnector.downloadAllUserPositions((int)userInfo.get("uId"));
+					InternetConnector.downloadAllUserPositions((Integer)userInfo.get("uId"));
 					// Send user data
 					//InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
 					

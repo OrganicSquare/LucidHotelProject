@@ -12,11 +12,11 @@ public class Player {
 	float xPos, yPos, zPos, xRot, yRot, zRot;
 	boolean isMoving;
 	public Player(Map<String, Object> userInfo){
-		user_id = (int)userInfo.get("uId");
-		xPos = (float)userInfo.get("xPos");
-		yPos = (float)userInfo.get("yPos");
-		zPos = (float)userInfo.get("zPos");
-		yRot = (float)userInfo.get("rotY");
+		user_id = (Integer)userInfo.get("uId");
+		xPos = (Float)userInfo.get("xPos");
+		yPos = (Float)userInfo.get("yPos");
+		zPos = (Float)userInfo.get("zPos");
+		yRot = (Float)userInfo.get("rotY");
 		animation = new Animation("Animations/Walking Man","Walking Man",1,20);
 	}	
 	

@@ -1,32 +1,69 @@
 package communication;
 
-import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import communication.Util;
 public class FileConnector {
 	private static String ProgramFilesLocation = null; 
+	private static String ProjectName = "LucidHotel";
 	public static void main(String args[]){
-	
-		loadGameFiles();
+
+		// Create data to write to file
+			String s = "hi";
+			Object[] fileData = new Object[]{s};
+		// Write to a file
+		writeGameFiles("userDetails.dat",fileData);
+		
+		// Read a file
+		Object[] fileReadData = readGameFiles("userDetails.dat");
+			// Access using fileReadData[KEY]
+		
+		
 	}
-	public static boolean loadGameFiles(){
+	public static Object[] readGameFiles(String Location){
+		Object[] fileResponse = new Object[100];
+		FileInputStream fin;
+		ObjectInputStream ois;
+		try {
+			fin = new FileInputStream(ProgramFilesLocation + ProjectName +File.separator +Location);
+			ois = new ObjectInputStream(fin);
+			int counter = 0;
+			while (fin.available() > 0){
+				fileResponse[counter] = (Object)ois.readObject();
+				counter += 1;
+			}
+			ois.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		return fileResponse;
+	}
+	public static boolean writeGameFiles(String Location, Object[] object){
 		boolean fileSuccess = false;
 		ProgramFilesLocation = documentLocation();
 		
-		boolean findLocation = createFolder("LucidHotel");
+		boolean findLocation = createFolder(ProjectName);
 		if(findLocation){
-			boolean findFile = createFile("LucidHotel" +File.separator +"userDetails.txt");
+			boolean findFile = createFile(ProjectName +File.separator +Location);
 			if(findFile){
-				String s = "hi";
-				Object[] fileData = new Object[]{s};
-				writeDataToFile("LucidHotel" +File.separator +"userDetails.txt",fileData);
+				writeDataToFile(ProjectName +File.separator +Location,object);
 				fileSuccess = true;
 			}
 		}
@@ -39,7 +76,6 @@ public class FileConnector {
 		FileOutputStream fileStream = null;
 		ObjectOutputStream outputStream = null;
 		try {
-			System.out.println("Writing data to " + ProgramFilesLocation + fileName);
 			fileStream = new FileOutputStream(ProgramFilesLocation+ fileName);
 			outputStream = new ObjectOutputStream(fileStream);
 			for(int i = 0; i< inputObject.length; i++){
@@ -59,7 +95,6 @@ public class FileConnector {
 		Boolean FileCreationSuccess = true;
 
 		File f = new File(ProgramFilesLocation + fileName);
-		System.out.println("Created New file: " + ProgramFilesLocation + fileName);
 		if (!f.exists()) {
 			
 			try {
