@@ -44,7 +44,7 @@ public class InternetConnector {
 	private final static String WEB_SERVER = "http://benallen.info/projects/GameJJB/bin/dataHandler.php";
 	private static Integer WEB_STATUS = 0; 
 	private final static int ITERATION_NUMBER = 1000;
-    public static String[] JSONRawMain;
+    public static String[] JSONRawMain = new String[100];
 	 static Timer timer;
     
 	public static void main(String args[])throws IOException{
@@ -416,6 +416,7 @@ public class InternetConnector {
 
 	public static String excutePostAsync(String[] urlName, String[] urlAttribute, final int responseKey)
 	  {
+
 		URIBuilder builder = new URIBuilder();
 		builder.setScheme("http").setHost("benallen.info").setPath("/projects/GameJJB/bin/dataHandler.php");
 		for (int i = 0; i < urlName.length; i++){
@@ -425,11 +426,9 @@ public class InternetConnector {
 		try {
 		    requestURL = builder.build();
 		} catch (URISyntaxException use) {}
-
 		ExecutorService threadpool = Executors.newFixedThreadPool(2);
 		Async async = Async.newInstance().use(threadpool);
 		final Request request = Request.Get(requestURL);
-
 		Future<Content> future = async.execute(request, new FutureCallback<Content>() {
 		    public void failed (final Exception e) {
 		        System.out.println(e.getMessage() +": "+ request);
@@ -440,7 +439,7 @@ public class InternetConnector {
 		    }
 
 		    public void cancelled () {
-		    	Util.logC("Internet Cancelled in excutePost");		    	
+		    	Util.logC("Internet Cancelled in excutePost");	
 		    }
 		});
 		
