@@ -83,17 +83,20 @@ public class Main{
 					otherUserInfo = InternetConnector.decodeUserPositions();
 					// Load in the other users data
 					for(int i = 0; i < otherUserInfo.size(); i++){
-						Map<String, Object> userInfo = otherUserInfo.get(i);
-						
-						//System.out.println(userInfo.get("xPos"));
-						player[i] = new Player(userInfo, standingMan);
+						Map<String, Object> userInfoOnline = otherUserInfo.get(i);
+						System.out.println(userInfoOnline.get("uId"));
+						System.out.println(userInfoOnline.get("xPos"));
+						System.out.println(userInfoOnline.get("yPos"));
+						System.out.println(userInfoOnline.get("zPos"));
+						player[i] = new Player(userInfoOnline, standingMan);
+						player[i].drawUser();
 					}
 					
 					// Set up download for next time
 					InternetConnector.downloadAllUserPositions((Integer)userInfo.get("uId"));
 					
 					// Send user data
-					//InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
+					InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
 					
 					// Will reset the delay
 					SYNC_DELAY = 0;
