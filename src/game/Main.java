@@ -70,6 +70,7 @@ public class Main{
 		cam.setY(1);
 		Animation walkingMan = new Animation("Animations/Walking Man","Walking Man",1,38);
 		Animation standingMan = new Animation("Animations/Walking Man","Standing Man",1);
+		Player clientUser = new Player(userInfo, walkingMan);
 		
 		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
@@ -85,8 +86,7 @@ public class Main{
 						Map<String, Object> userInfo = otherUserInfo.get(i);
 						
 						//System.out.println(userInfo.get("xPos"));
-						//player[i] = new Player(userInfo);
-						//player[i].animation.animate(0.7f);
+						player[i] = new Player(userInfo, standingMan);
 					}
 					
 					// Set up download for next time
@@ -102,8 +102,12 @@ public class Main{
 				userInput(cam);
 				glClear(GL_COLOR_BUFFER_BIT);
 				glClear(GL_DEPTH_BUFFER_BIT);
+				
 				glPushMatrix();
 				glPopMatrix();
+				
+				clientUser.drawUser();
+				
 				glLoadIdentity();
 				cam.useCam();
 				drawAxis();
