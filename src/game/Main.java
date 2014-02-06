@@ -86,6 +86,7 @@ public class Main{
 					// Load in the other users data
 					for(int i = 0; i < otherUserInfo.size(); i++){
 						Map<String, Object> userInfo = otherUserInfo.get(i);
+						
 						//System.out.println(userInfo.get("xPos"));
 						//player[i] = new Player(userInfo);
 						//player[i].animation.animate(0.7f);
@@ -93,6 +94,7 @@ public class Main{
 					
 					// Set up download for next time
 					InternetConnector.downloadAllUserPositions((Integer)userInfo.get("uId"));
+					
 					// Send user data
 					//InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
 					

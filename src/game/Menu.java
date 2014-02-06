@@ -22,7 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import communication.FileConnector;
 import communication.InternetConnector;
+import communication.Util;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -157,7 +159,7 @@ public class Menu extends JPanel{
 				// Show loading bar
 				loadingGif.setVisible(true);
                 loginPane.setVisible(false);
-                InternetConnector.JSONRawMain[0] = "";
+                
 				InternetConnector.findUser(usernameTF.getText());				
 				asyncCheckLogin(200);
 				
@@ -171,7 +173,14 @@ public class Menu extends JPanel{
 		loadingGif.setVisible(false);
 		add(loadingGif);
 		
-		
+		// Try and load details in from file
+		Object[] fileReadData = FileConnector.readGameFiles("userDetails.dat");
+		if(fileReadData[0] != null && Util.isValid(fileReadData[0].toString()) && Util.isValid(fileReadData[1].toString())){
+			usernameTF.setText(fileReadData[0].toString());
+			passwordTF.setText(fileReadData[1].toString());
+			usernameLBL.setVisible(false);
+			passwordLBL.setVisible(false);
+		}
 		// generate sign up button
 		//signupBTN.setBounds(70,5,100,20);
 		//signupPane.add(signupBTN);
@@ -189,10 +198,7 @@ public class Menu extends JPanel{
 		}
 	 class initialDownloadCompleteLogin extends TimerTask {
 	        public void run() {
-	            if(InternetConnector.JSONRawMain[1].equals("")){
-	            	asyncCheckLogin(200);
-	            	
-	            } else {
+	            if(Util.isValid(InternetConnector.JSONRawMain[1])){	            	
 	            	if(InternetConnector.isLoginOK(passwordTF.getText())){	            
 	            		InternetConnector.excutePostAsync(new String[]{"target","userName"}, new String[]{"logUserIn",usernameTF.getText()}, 0);
 		            	InternetConnector.downloadUserInformation(usernameTF.getText());
@@ -205,6 +211,8 @@ public class Menu extends JPanel{
 					}	            	
 	            	timerLogin.cancel(); 
 	            	
+	            } else {
+	            	asyncCheckLogin(200);
 	            }
 	        }
 	    }
@@ -215,15 +223,26 @@ public class Menu extends JPanel{
 		}
 	 class initialDownloadCompleteUser extends TimerTask {
 	        public void run() {
-	            if(InternetConnector.JSONRawMain[1].equals("")){
-	            	asyncCheckUser(100);
+	            if(Util.isValid(InternetConnector.JSONRawMain[1])){	            	
+	            	// The user is ok to log in
 	            	
-	            } else {
+	            	// Save details to file
+	            	
+	            	// Create data to write to file
+	    			String username = usernameTF.getText();
+	    			String password = passwordTF.getText();
+	    			Object[] fileData = new Object[]{username,password};
+	    			// Write to a file
+	    			FileConnector.writeGameFiles("userDetails.dat",fileData);
+	            	
+	            	// Show GUI
 	            	Main.loginSuccessful = true;
 	            	Map<String, Object> UserInfoFromNet = InternetConnector.decodeUserInformation();
 	            	Main.userInfo = UserInfoFromNet;
 	            	Main.lwjglCanvas.setVisible(true);
-	            	timerUser.cancel(); 
+	            	timerUser.cancel(); 	            	
+	            } else {
+	            	asyncCheckUser(100);	            	
 	            }
 	        }
 	    }

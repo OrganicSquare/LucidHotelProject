@@ -44,7 +44,7 @@ public class InternetConnector {
 	private final static String WEB_SERVER = "http://benallen.info/projects/GameJJB/bin/dataHandler.php";
 	private static Integer WEB_STATUS = 0; 
 	private final static int ITERATION_NUMBER = 1000;
-    public static String[] JSONRawMain = new String[100];
+    public static String JSONRawMain[] = new String[100];
 	 static Timer timer;
     
 	public static void main(String args[])throws IOException{
@@ -115,7 +115,7 @@ public class InternetConnector {
 	}
 	public static Map<Integer, Map<String, Object>> decodeUserPositions() {
 		Map<Integer, Map<String, Object>> ComputationResponse = new HashMap<Integer, Map<String, Object>>();
-		String JSONRaw = JSONRawMain[0];
+		String JSONRaw = JSONRawMain[1];
 		if(JSONRaw.trim().equals("false")){
 			System.out.println("Warning: There are no users currently online");
 			
@@ -124,7 +124,8 @@ public class InternetConnector {
 			if(!JSONRaw.equals("") && !JSONRaw.equals("true")){
 			Object obj=JSONValue.parse(JSONRaw);
 			JSONArray array=(JSONArray)obj;
-				for (int i = 0; i< array.size(); i++){
+			System.out.println("There are " + array.size() + " users online. Find there data using Map<String, Object> userInfo = otherUserInfo.get(PLAYER_NUMBER);");
+				for (int i = 0; i< array.size(); i++){					
 					Map<String, Object> UserDetails = new HashMap<String, Object>();
 					JSONObject playerDetails=(JSONObject)array.get(i);			
 					try {
@@ -167,9 +168,9 @@ public class InternetConnector {
 	}	
 	public static Map<String, Object> decodeUserInformation(){
 		Map<String, Object> ComputationResponse = new HashMap<String, Object>();
-		String JSONRaw = JSONRawMain[0];
+		String JSONRaw = JSONRawMain[1];
 		Object obj=JSONValue.parse(JSONRaw);
-		JSONRawMain[0] = "";
+		JSONRawMain[1] = "";
 		JSONArray array=(JSONArray)obj;
 		JSONObject playerDetails=(JSONObject)array.get(0);			
 		
@@ -304,9 +305,9 @@ public class InternetConnector {
 		String JSONRaw = null;
 		Util.logC("=== isLoginOK");
 		boolean ComputationResponse = false;
-		JSONRaw = JSONRawMain[0];
-		JSONRawMain[0] = "";
-		if(JSONRaw.length() < 200 && !JSONRaw.trim().equals("[false]")){
+		JSONRaw = JSONRawMain[1];
+		JSONRawMain[1] = "";
+		if(Util.isValid(JSONRaw)){
 			try {		
 				Object obj=JSONValue.parse(JSONRaw);
 				JSONArray array=(JSONArray)obj;

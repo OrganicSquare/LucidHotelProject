@@ -16,7 +16,7 @@ public class FileConnector {
 	public static void main(String args[]){
 
 		// Create data to write to file
-			String s = "hi";
+			String s = "";
 			Object[] fileData = new Object[]{s};
 		// Write to a file
 		writeGameFiles("userDetails.dat",fileData);
@@ -28,6 +28,7 @@ public class FileConnector {
 		
 	}
 	public static Object[] readGameFiles(String Location){
+		ProgramFilesLocation = documentLocation();
 		Object[] fileResponse = new Object[100];
 		FileInputStream fin;
 		ObjectInputStream ois;
@@ -41,8 +42,10 @@ public class FileConnector {
 			}
 			ois.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Object[] fileData = new Object[]{"[false]","[false]"};
+			// Write to a file
+			FileConnector.writeGameFiles(Location,fileData);
+			readGameFiles(Location);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

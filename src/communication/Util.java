@@ -12,4 +12,12 @@ public class Util {
    System.out.println(content);
   }
  }
+ public static boolean isValid(String content){
+	 if(content != null && !content.isEmpty() && !content.equals("") && !content.equals("[false]") && content.length() != 0 && content.length() < 500){
+		 return true;
+	 } else {
+		 return false;
+	 }
+	 
+ }
 }
