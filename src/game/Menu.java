@@ -157,7 +157,7 @@ public class Menu extends JPanel{
 				// Show loading bar
 				loadingGif.setVisible(true);
                 loginPane.setVisible(false);
-                InternetConnector.JSONRawMain = "";
+                InternetConnector.JSONRawMain[0] = "";
 				InternetConnector.findUser(usernameTF.getText());				
 				asyncCheckLogin(200);
 				
@@ -189,12 +189,12 @@ public class Menu extends JPanel{
 		}
 	 class initialDownloadCompleteLogin extends TimerTask {
 	        public void run() {
-	            if(InternetConnector.JSONRawMain.equals("")){
+	            if(InternetConnector.JSONRawMain[1].equals("")){
 	            	asyncCheckLogin(200);
 	            	
 	            } else {
 	            	if(InternetConnector.isLoginOK(passwordTF.getText())){	            
-	            		InternetConnector.excutePostAsync(new String[]{"target","userName"}, new String[]{"logUserIn",usernameTF.getText()}, true);
+	            		InternetConnector.excutePostAsync(new String[]{"target","userName"}, new String[]{"logUserIn",usernameTF.getText()}, 0);
 		            	InternetConnector.downloadUserInformation(usernameTF.getText());
 		            	asyncCheckUser(100);						
 					} else {
@@ -215,7 +215,7 @@ public class Menu extends JPanel{
 		}
 	 class initialDownloadCompleteUser extends TimerTask {
 	        public void run() {
-	            if(InternetConnector.JSONRawMain.equals("")){
+	            if(InternetConnector.JSONRawMain[1].equals("")){
 	            	asyncCheckUser(100);
 	            	
 	            } else {

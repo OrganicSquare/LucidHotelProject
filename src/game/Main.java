@@ -13,6 +13,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -22,6 +23,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 
 import communication.InternetConnector;
 
@@ -37,9 +39,6 @@ public class Main{
 	
 	static Map<Integer, Map<String, Object>> otherUserInfo = null;
 	
-	static int USERID;
-	static float userxPos, useryPos, userzPos, userxRot, useryRot, userzRot;
-	
 	static Animation animation[] = new Animation[16];
 	static Player player[] = new Player[MAX_PLAYERS];
 	static Player userPlayer;
@@ -54,7 +53,7 @@ public class Main{
 		public void windowClosing(WindowEvent w) {
 			windowClosed = true;
 			if(loginSuccessful){
-				communication.InternetConnector.logoutUser((int)userInfo.get("uId"));
+				//communication.InternetConnector.logoutUser((Integer)userInfo.get("uId"));
 			}
 			System.exit(0);
 		}
@@ -71,43 +70,68 @@ public class Main{
 		Camera cam = new Camera(70,(float)WIDTH/(float)HEIGHT,0.3f,1000);
 		cam.setZ(10);
 		cam.setY(1);
-		animation[0] = new Animation("Animations/Walking Man","Walking Man",1,38);
-		animation[1] = new Animation("Animations/Walking Man","Walking Man",1,38);
+		Animation standingMan = new Animation("Animations/Walking Man","Standing Man",1);
+		Animation walkingMan = new Animation("Animations/Walking Man","Walking Man",2, 3);
+		//Player player1 = new Player(userInfo, walkingMan);
+		loginSuccessful = true;
+		
+		Map<String, Object> ComputationResponse = new HashMap<String, Object>();
+		ComputationResponse.put("uId", 2);
+		ComputationResponse.put("uSkin", null);
+		ComputationResponse.put("xPos", 2f);
+		ComputationResponse.put("yPos", 0.5f);
+		ComputationResponse.put("zPos", 1f);
+		ComputationResponse.put("rotY", 30f);
+		Map<String, Object> ComputationResponse2 = new HashMap<String, Object>();
+		ComputationResponse2.put("uId", 4);
+		ComputationResponse2.put("uSkin", null);
+		ComputationResponse2.put("xPos", 0f);
+		ComputationResponse2.put("yPos", 0f);
+		ComputationResponse2.put("zPos", -2f);
+		ComputationResponse2.put("rotY", 60f);
+		Player player1 = new Player(ComputationResponse, standingMan);
+		Player player2 = new Player(ComputationResponse2, walkingMan);
+		
 		
 		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
-				if(!initialisedUserInfo){
-					initUserInfo();
-				}
-				if(SYNC_DELAY > SYNC_DELAY_MAX) {
+				/*if(!initialisedUserInfo){
+					initUserInfo(walkingMan);
+				}*/
+				/*if(SYNC_DELAY > SYNC_DELAY_MAX) {
 					
 					// Download other user data
 					otherUserInfo = InternetConnector.decodeUserPositions();
-					System.out.println(otherUserInfo);
 					// Load in the other users data
 					for(int i = 0; i < otherUserInfo.size(); i++){
 						Map<String, Object> userInfo = otherUserInfo.get(i);
-						player[i] = new Player(userInfo);
-						player[i].animation.animate(0.7f);
+						//System.out.println(userInfo.get("xPos"));
+						//player[i] = new Player(userInfo, walkingMan);
+						//player[i].animation.animate(0.7f);
 					}
 					
 					// Set up download for next time
-					//InternetConnector.downloadAllUserPositions((int)userInfo.get("uId"));
+					InternetConnector.downloadAllUserPositions((Integer)userInfo.get("uId"));
 					// Send user data
 					//InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
 					
 					// Will reset the delay
 					SYNC_DELAY = 0;
-				} else {SYNC_DELAY += 1;}
+				} else {SYNC_DELAY += 1;}*/
 				
 				userInput(cam);
 				glClear(GL_COLOR_BUFFER_BIT);
 				glClear(GL_DEPTH_BUFFER_BIT);
+				
 				glPushMatrix();
-				glRotatef(useryRot,0,1,0);
-				glTranslatef(userxPos,useryPos,userzPos);
-				animation[0].animate(0.7f);
+				glTranslatef(0,0,0);
 				glPopMatrix();
+				
+				player1.drawUser();
+				player1.setAnimating(true);
+				player2.drawUser();
+				player2.setAnimating(true);
+				
 				glLoadIdentity();
 				cam.useCam();
 				drawAxis();
@@ -117,9 +141,9 @@ public class Main{
 		}
 	}
 	
-	public static void initUserInfo(){
+	public static void initUserInfo(Animation anim){
 		initialisedUserInfo = true;
-		userPlayer = new Player(userInfo);
+		userPlayer = new Player(userInfo, anim);
 	}
 	
 	public static void userInput(Camera cam){
@@ -198,7 +222,6 @@ public class Main{
 		// set Ideal size
 		frame.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		frame.pack();
-		frame.setLocationRelativeTo(null);
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
@@ -207,8 +230,8 @@ public class Main{
 		lwjglCanvas.setBounds(0,0,WIDTH,HEIGHT);
 		
 		frame.add(lwjglCanvas);
-		lwjglCanvas.setVisible(false);
-		initMenu();
+		lwjglCanvas.setVisible(true);
+		//initMenu();
 		frame.setVisible(true);
 		initDisplay();
 		frame.addWindowListener(listener);

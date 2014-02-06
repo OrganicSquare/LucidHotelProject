@@ -39,12 +39,12 @@ import org.apache.http.concurrent.FutureCallback;
 import communication.Util;
 import java.util.Timer;
 import java.util.TimerTask;
-// FROM MODELLOADER
+
 public class InternetConnector {
 	private final static String WEB_SERVER = "http://benallen.info/projects/GameJJB/bin/dataHandler.php";
 	private static Integer WEB_STATUS = 0; 
 	private final static int ITERATION_NUMBER = 1000;
-    public static String JSONRawMain;
+    public static String[] JSONRawMain = new String[100];
 	 static Timer timer;
     
 	public static void main(String args[])throws IOException{
@@ -111,30 +111,37 @@ public class InternetConnector {
 		String JSONRaw = null;		
 		urlName = new String[]{"target", "uId"};
 		urlAttribute = new String[]{"findOnlinePlayers",Integer.toString(uId)};		
-		excutePostAsync(urlName,urlAttribute, false);
+		excutePostAsync(urlName,urlAttribute, 1);
 	}
 	public static Map<Integer, Map<String, Object>> decodeUserPositions() {
 		Map<Integer, Map<String, Object>> ComputationResponse = new HashMap<Integer, Map<String, Object>>();
-		if(!JSONRawMain.equals("") && !JSONRawMain.equals("true")){
-		Object obj=JSONValue.parse(JSONRawMain);
-		JSONArray array=(JSONArray)obj;
-		for (int i = 0; i< array.size(); i++){
-			Map<String, Object> UserDetails = new HashMap<String, Object>();
-			JSONObject playerDetails=(JSONObject)array.get(i);			
-			try {
-				UserDetails.put("uId", Integer.parseInt(playerDetails.get("id").toString()));
-				UserDetails.put("uName", playerDetails.get("userName").toString());
-				UserDetails.put("uSkin", playerDetails.get("skin").toString());
-				UserDetails.put("yPos", Float.parseFloat(playerDetails.get("yPos").toString()));
-				UserDetails.put("xPos", Float.parseFloat(playerDetails.get("xPos").toString()));
-				UserDetails.put("zPos", Float.parseFloat(playerDetails.get("zPos").toString()));
-				UserDetails.put("rotY", Float.parseFloat(playerDetails.get("rotY").toString()));
-				UserDetails.put("isMoving", Boolean.parseBoolean(playerDetails.get("yPos").toString()));
-			} catch (Exception ex) {
-				System.out.println("Error converting the user positions w/ data : " + JSONRawMain);				
+		String JSONRaw = JSONRawMain[0];
+		if(JSONRaw.trim().equals("false")){
+			System.out.println("Warning: There are no users currently online");
+			
+			return ComputationResponse;
+		} else {
+			if(!JSONRaw.equals("") && !JSONRaw.equals("true")){
+			Object obj=JSONValue.parse(JSONRaw);
+			JSONArray array=(JSONArray)obj;
+				for (int i = 0; i< array.size(); i++){
+					Map<String, Object> UserDetails = new HashMap<String, Object>();
+					JSONObject playerDetails=(JSONObject)array.get(i);			
+					try {
+						UserDetails.put("uId", Integer.parseInt(playerDetails.get("id").toString()));
+						UserDetails.put("uName", playerDetails.get("userName").toString());
+						UserDetails.put("uSkin", playerDetails.get("skin").toString());
+						UserDetails.put("yPos", Float.parseFloat(playerDetails.get("yPos").toString()));
+						UserDetails.put("xPos", Float.parseFloat(playerDetails.get("xPos").toString()));
+						UserDetails.put("zPos", Float.parseFloat(playerDetails.get("zPos").toString()));
+						UserDetails.put("rotY", Float.parseFloat(playerDetails.get("rotY").toString()));
+						UserDetails.put("isMoving", Boolean.parseBoolean(playerDetails.get("yPos").toString()));
+					} catch (Exception ex) {
+						System.out.println("Error converting the user positions w/ data : " + JSONRaw);				
+					}
+					ComputationResponse.put(i, UserDetails);
+				}	
 			}
-			ComputationResponse.put(i, UserDetails);
-		}	
 		}
 		
 		return ComputationResponse;
@@ -155,14 +162,14 @@ public class InternetConnector {
 		return ReturnResponse;
 	}
 	public static void downloadUserInformation(String userName){	
-		JSONRawMain = "";
-		excutePostAsync(new String[]{"target","userName"}, new String[]{"userInformation",userName}, false);		
+		JSONRawMain[0] = "";
+		excutePostAsync(new String[]{"target","userName"}, new String[]{"userInformation",userName}, 1);		
 	}	
 	public static Map<String, Object> decodeUserInformation(){
 		Map<String, Object> ComputationResponse = new HashMap<String, Object>();
-		String JSONRaw = JSONRawMain;
+		String JSONRaw = JSONRawMain[0];
 		Object obj=JSONValue.parse(JSONRaw);
-		JSONRawMain = "";
+		JSONRawMain[0] = "";
 		JSONArray array=(JSONArray)obj;
 		JSONObject playerDetails=(JSONObject)array.get(0);			
 		
@@ -182,7 +189,7 @@ public class InternetConnector {
 		urlName = new String[]{"target","uId","xPos","yPos","zPos","rotY","isMoving"};
 		urlAttribute = new String[]{"positionUpdater",String.valueOf(uId),String.valueOf(positionData[0]),String.valueOf(positionData[1]),String.valueOf(positionData[2]),String.valueOf(positionData[3]),String.valueOf(positionData[4])};
 		
-		excutePostAsync(urlName,urlAttribute, true);
+		excutePostAsync(urlName,urlAttribute, 0);
 				
 			
 	}
@@ -283,7 +290,7 @@ public class InternetConnector {
 	    * @return boolean Returns a JSON array of users digest and salt
 	    */
 	public static void findUser(String username) {
-		excutePostAsync(new String[]{"target","uName"}, new String[]{"findUser",username}, false);	
+		excutePostAsync(new String[]{"target","uName"}, new String[]{"findUser",username}, 1);	
 	}
 	 /**
 	    * Authenticates the user with a given login and password
@@ -297,8 +304,8 @@ public class InternetConnector {
 		String JSONRaw = null;
 		Util.logC("=== isLoginOK");
 		boolean ComputationResponse = false;
-		JSONRaw = JSONRawMain;
-		JSONRawMain = "";
+		JSONRaw = JSONRawMain[0];
+		JSONRawMain[0] = "";
 		if(JSONRaw.length() < 200 && !JSONRaw.trim().equals("[false]")){
 			try {		
 				Object obj=JSONValue.parse(JSONRaw);
@@ -407,8 +414,9 @@ public class InternetConnector {
 
 	    */
 
-	public static String excutePostAsync(String[] urlName, String[] urlAttribute, final Boolean doPassive)
+	public static String excutePostAsync(String[] urlName, String[] urlAttribute, final int responseKey)
 	  {
+
 		URIBuilder builder = new URIBuilder();
 		builder.setScheme("http").setHost("benallen.info").setPath("/projects/GameJJB/bin/dataHandler.php");
 		for (int i = 0; i < urlName.length; i++){
@@ -418,22 +426,20 @@ public class InternetConnector {
 		try {
 		    requestURL = builder.build();
 		} catch (URISyntaxException use) {}
-
 		ExecutorService threadpool = Executors.newFixedThreadPool(2);
 		Async async = Async.newInstance().use(threadpool);
 		final Request request = Request.Get(requestURL);
-
 		Future<Content> future = async.execute(request, new FutureCallback<Content>() {
 		    public void failed (final Exception e) {
 		        System.out.println(e.getMessage() +": "+ request);
 		        System.out.println("fail");
 		    }
 		    public void completed (final Content content) {
-		        if(!doPassive){JSONRawMain = content.asString();}
+		        JSONRawMain[responseKey] = content.asString();
 		    }
 
 		    public void cancelled () {
-		    	Util.logC("Internet Cancelled in excutePost");		    	
+		    	Util.logC("Internet Cancelled in excutePost");	
 		    }
 		});
 		
