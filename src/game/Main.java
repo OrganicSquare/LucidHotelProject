@@ -37,9 +37,6 @@ public class Main{
 	
 	static Map<Integer, Map<String, Object>> otherUserInfo = null;
 	
-	static int USERID;
-	static float userxPos, useryPos, userzPos, userxRot, useryRot, userzRot;
-	
 	static Animation animation[] = new Animation[16];
 	static Player player[] = new Player[MAX_PLAYERS];
 	static Player userPlayer;
@@ -71,13 +68,13 @@ public class Main{
 		Camera cam = new Camera(70,(float)WIDTH/(float)HEIGHT,0.3f,1000);
 		cam.setZ(10);
 		cam.setY(1);
-		animation[0] = new Animation("Animations/Walking Man","Walking Man",1,38);
-		animation[1] = new Animation("Animations/Walking Man","Walking Man",1,38);
+		Animation walkingMan = new Animation("Animations/Walking Man","Walking Man",1,38);
+		Animation standingMan = new Animation("Animations/Walking Man","Standing Man",1);
 		
 		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
 				if(!initialisedUserInfo){
-					initUserInfo();
+					initUserInfo(walkingMan);
 				}
 				if(SYNC_DELAY > SYNC_DELAY_MAX) {
 					
@@ -106,9 +103,6 @@ public class Main{
 				glClear(GL_COLOR_BUFFER_BIT);
 				glClear(GL_DEPTH_BUFFER_BIT);
 				glPushMatrix();
-				glRotatef(useryRot,0,1,0);
-				glTranslatef(userxPos,useryPos,userzPos);
-				animation[0].animate(0.7f);
 				glPopMatrix();
 				glLoadIdentity();
 				cam.useCam();
@@ -119,9 +113,9 @@ public class Main{
 		}
 	}
 	
-	public static void initUserInfo(){
+	public static void initUserInfo(Animation startingModel){
 		initialisedUserInfo = true;
-		userPlayer = new Player(userInfo);
+		userPlayer = new Player(userInfo, startingModel);
 	}
 	
 	public static void userInput(Camera cam){
