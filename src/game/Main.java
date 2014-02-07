@@ -33,6 +33,7 @@ public class Main{
 	static final int SYNC_DELAY_MAX = 100;
 	
 	static Map<String, Object> userInfo;
+	static Player clientUser;
 	static boolean loginSuccessful = false, windowClosed = false;
 	
 	static Map<Integer, Map<String, Object>> otherUserInfo = null;
@@ -70,12 +71,12 @@ public class Main{
 		cam.setY(1);
 		Animation walkingMan = new Animation("Animations/Walking Man","Walking Man",1,38);
 		Animation standingMan = new Animation("Animations/Walking Man","Standing Man",1);
-		Player clientUser = new Player(userInfo, walkingMan);
+		clientUser = new Player(userInfo, walkingMan);
 		
 		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
 				if(!initialisedUserInfo){
-					initUserInfo(walkingMan);
+					initUserInfo(standingMan);
 				}
 				if(SYNC_DELAY > SYNC_DELAY_MAX) {
 					
@@ -168,6 +169,16 @@ public class Main{
 		if(cam.getRotY() <= -360){
 			cam.setRotY(0);
 		}
+
+		if(Keyboard.isKeyDown(Keyboard.KEY_R)){
+			clientUser.zPos += 0.1f;
+			userInfo.put("zPos",clientUser.zPos);
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_V)){
+			clientUser.zPos -= 0.1f;
+			userInfo.put("zPos",clientUser.zPos);
+		}
+
 	}
 	public static void drawAxis(){
 		glPushMatrix();
