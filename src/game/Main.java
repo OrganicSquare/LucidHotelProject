@@ -13,11 +13,13 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -30,7 +32,7 @@ public class Main{
 	static int HEIGHT = 675;
 	static final int MAX_PLAYERS = 8;
 	static int SYNC_DELAY = 0;
-	static final int SYNC_DELAY_MAX = 100;
+	static final int SYNC_DELAY_MAX = 5;
 	
 	static Map<String, Object> userInfo;
 	static Player clientUser;
@@ -40,13 +42,13 @@ public class Main{
 	
 	static Animation animation[] = new Animation[16];
 	static Player player[] = new Player[MAX_PLAYERS];
-	static Player userPlayer;
 	static int[] playerIntToID;
 	
 	static JFrame frame = new JFrame("Multiplayer");
 	static Canvas lwjglCanvas = new Canvas();
 	static JPanel mainMenu = new JPanel();
-	static boolean initialisedUserInfo = false;
+	static boolean initialisedUserInfo = false, initOtherUserInfo = true;
+	static int playerNum = 0;
 	
 	static WindowListener listener = new WindowAdapter() {
 		public void windowClosing(WindowEvent w) {
@@ -68,13 +70,16 @@ public class Main{
 		Lighting.initLight();
 		Camera cam = new Camera(70,(float)WIDTH/(float)HEIGHT,0.3f,1000);
 		cam.setZ(10);
-		cam.setY(1);
+		cam.setY(3);
 		Animation walkingMan = new Animation("Animations/Walking Man","Walking Man",1,38);
 		Animation standingMan = new Animation("Animations/Walking Man","Standing Man",1);
-		clientUser = new Player(userInfo, walkingMan);
+		
 		
 		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
+				userInput(cam);
+				glClear(GL_COLOR_BUFFER_BIT);
+				glClear(GL_DEPTH_BUFFER_BIT);
 				if(!initialisedUserInfo){
 					initUserInfo(standingMan);
 				}
@@ -83,14 +88,27 @@ public class Main{
 					// Download other user data
 					otherUserInfo = InternetConnector.decodeUserPositions();
 					// Load in the other users data
-					for(int i = 0; i < otherUserInfo.size(); i++){
-						Map<String, Object> userInfoOnline = otherUserInfo.get(i);
-						System.out.println(userInfoOnline.get("uId"));
-						System.out.println(userInfoOnline.get("xPos"));
-						System.out.println(userInfoOnline.get("yPos"));
-						System.out.println(userInfoOnline.get("zPos"));
-						player[i] = new Player(userInfoOnline, standingMan);
-						player[i].drawUser();
+					if(initOtherUserInfo){
+						for(int i = 0; i < otherUserInfo.size(); i++){
+							Map<String, Object> userInfoOnline = otherUserInfo.get(i);
+							player[i] = new Player(userInfoOnline, standingMan);
+							initOtherUserInfo = false;
+							playerNum++;
+						}
+					}
+					else{
+						for(int i = 0; i < otherUserInfo.size(); i++){
+							Map<String, Object> userInfoOnline = otherUserInfo.get(i);
+							try{
+							player[i].xPos = (float)userInfoOnline.get("xPos");
+							player[i].yPos = (float)userInfoOnline.get("yPos");
+							player[i].zPos = (float)userInfoOnline.get("zPos");
+							player[i].yRot = (float)userInfoOnline.get("rotY");
+							}
+							catch(Exception e){
+								e.printStackTrace();
+							}
+						}
 					}
 					
 					// Set up download for next time
@@ -103,17 +121,19 @@ public class Main{
 					SYNC_DELAY = 0;
 				} else {SYNC_DELAY += 1;}
 				
-				userInput(cam);
-				glClear(GL_COLOR_BUFFER_BIT);
-				glClear(GL_DEPTH_BUFFER_BIT);
-				
-				glPushMatrix();
-				glPopMatrix();
-				
+				glLight(GL_LIGHT0, GL_POSITION, asFloatBuffer(new float[]{0f,3f,0f,1f}));				
+				for(int i = 0;i<playerNum;i++){
+					player[i].drawUser();
+				}				
 				clientUser.drawUser();
 				
 				glLoadIdentity();
+				cam.setRotY((float)Vector.angle(clientUser.xPos,clientUser.zPos,cam.getX(),cam.getZ()) + 180);
 				cam.useCam();
+				
+				
+				
+				
 				drawAxis();
 			}
 			Display.update();
@@ -121,30 +141,44 @@ public class Main{
 		}
 	}
 	
+	private static FloatBuffer asFloatBuffer(float[] values){
+		FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+		buffer.put(values);
+		buffer.flip();
+		return buffer;
+	}
+	
 	public static void initUserInfo(Animation startingModel){
 		initialisedUserInfo = true;
-		userPlayer = new Player(userInfo, startingModel);
+		clientUser = new Player(userInfo, startingModel);
 	}
 	
 	public static void userInput(Camera cam){
 		float speed = 0.1f;
 		float rotSpeed = 3f;
-		if(Keyboard.isKeyDown(Keyboard.KEY_A)){
-			cam.setX(cam.getX() - (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
-			cam.setZ(cam.getZ() - (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
+		
+		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
+			clientUser.xPos += Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed;
+			clientUser.zPos += Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed;
+			
+			/*cam.setX(cam.getX() + (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
+			cam.setZ(cam.getZ() - (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);*/
 		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_D)){
-			cam.setX(cam.getX() + (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
-			cam.setZ(cam.getZ() + (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
+		if(Keyboard.isKeyDown(Keyboard.KEY_A)){
+			clientUser.yRot += 3f;
+			System.out.println(clientUser.yRot);
+			/*cam.setX(cam.getX() - (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
+			cam.setZ(cam.getZ() - (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);*/
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_S)){
 			cam.setX(cam.getX() - (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
 			cam.setZ(cam.getZ() + (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
 		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
-			cam.setX(cam.getX() + (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
-			cam.setZ(cam.getZ() - (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
+		if(Keyboard.isKeyDown(Keyboard.KEY_D)){
+			clientUser.yRot -= 3f;
+			System.out.println(clientUser.yRot);
 		}
+		
 		if(Keyboard.isKeyDown(Keyboard.KEY_LEFT)){
 			cam.setRotY(cam.getRotY() - rotSpeed);
 		}
@@ -178,7 +212,6 @@ public class Main{
 			clientUser.zPos -= 0.1f;
 			userInfo.put("zPos",clientUser.zPos);
 		}
-
 	}
 	public static void drawAxis(){
 		glPushMatrix();

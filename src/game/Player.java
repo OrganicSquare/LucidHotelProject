@@ -8,8 +8,8 @@ import static org.lwjgl.opengl.GL11.*;
 public class Player {
 	Animation animation;
 	int user_id;
-	float xPos, yPos, zPos, xRot, yRot, zRot, timer;
-	boolean isMoving, isAnimating;
+	float xPos, yPos, zPos, xRot, yRot, zRot, timer, speed = 0.1f;
+	boolean isMoving, isAnimating = true;
 	public Player(Map<String, Object> userInfo, Animation anim){
 		this.user_id = (Integer)userInfo.get("uId");
 		this.xPos = (Float)userInfo.get("xPos");
@@ -21,10 +21,13 @@ public class Player {
 	
 	public void drawUser(){
 		glPushMatrix();
+		
+		glTranslatef(xPos,yPos,zPos);
+		
 		glRotatef(xRot,1,0,0);
 		glRotatef(yRot,0,1,0);
 		glRotatef(zRot,0,0,1);
-		glTranslatef(xPos,yPos,zPos);
+		
 		animate(0.5f);
 		glPopMatrix();
 	}
