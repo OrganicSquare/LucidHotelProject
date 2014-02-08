@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Player {
 	Animation animation;
 	int user_id;
-	float xPos, yPos, zPos, xRot, yRot, zRot, timer, speed = 0.1f;
+	float xPos, yPos, zPos, xRot, yRot, zRot, timer = 1, speed = 0.1f;
 	boolean isMoving, isAnimating = true;
 	public Player(Map<String, Object> userInfo, Animation anim){
 		this.user_id = (Integer)userInfo.get("uId");

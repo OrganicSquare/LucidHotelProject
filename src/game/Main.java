@@ -81,6 +81,7 @@ public class Main{
 				userInput(cam);
 				glClear(GL_COLOR_BUFFER_BIT);
 				glClear(GL_DEPTH_BUFFER_BIT);
+				
 				if(!initialisedUserInfo){
 					initUserInfo(standingMan);
 				}
@@ -125,7 +126,14 @@ public class Main{
 				glLight(GL_LIGHT0, GL_POSITION, asFloatBuffer(new float[]{0f,3f,0f,1f}));				
 				for(int i = 0;i<playerNum;i++){
 					player[i].drawUser();
-				}				
+				}
+				
+				if(clientUser.isMoving){
+					clientUser.setModel(walkingMan);
+				}
+				else{
+					clientUser.setModel(standingMan);
+				}
 				clientUser.drawUser();
 				
 				glLoadIdentity();
@@ -165,12 +173,10 @@ public class Main{
 		float speed = 0.1f;
 		float rotSpeed = 3f;
 		
-		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
+		if(Keyboard.isKeyDown(Keyboard.KEY_W) && !initOtherUserInfo){
 			clientUser.xPos += Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.zPos += Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed;
-			
-			/*cam.setX(cam.getX() + (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
-			cam.setZ(cam.getZ() - (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);*/
+			clientUser.isMoving = true;
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)){
 			userTurn-= 1f;
@@ -178,9 +184,10 @@ public class Main{
 			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
 			clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
 		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_S)){
+		if(Keyboard.isKeyDown(Keyboard.KEY_S) && !initOtherUserInfo){
 			cam.setX(cam.getX() - (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
 			cam.setZ(cam.getZ() + (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
+			clientUser.isMoving = true;
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_D)){
 			userTurn+= 1f;
@@ -188,7 +195,9 @@ public class Main{
 			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
 			clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
 		}
-		
+		if(!Keyboard.isKeyDown(Keyboard.KEY_W) && !Keyboard.isKeyDown(Keyboard.KEY_S) && !initOtherUserInfo){
+			clientUser.isMoving = false;
+		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_LEFT)){
 			cam.setRotY(cam.getRotY() - rotSpeed);
 		}
