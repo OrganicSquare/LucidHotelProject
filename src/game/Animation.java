@@ -36,7 +36,7 @@ public class Animation{
 			Model m = null;
 			try{
 				m = OBJLoader.loadModel(new File("res\\"+dir+"\\"+filename+"_"+String.format("%06d", i+start-1)+".obj"));
-				System.out.println(i);
+				System.out.println("Loading: " + i);
 			}
 			catch(FileNotFoundException e){
 				e.printStackTrace();
@@ -80,7 +80,9 @@ public class Animation{
 			Model m = null;
 			try{
 				m = OBJLoader.loadModel(new File("res\\"+dir+"\\"+filename+"_"+String.format("%06d", i+start-1)+".obj"));
-				System.out.println(i);
+				if(i == 38){
+					System.out.println("Loading Finished");
+				}
 			}
 			catch(FileNotFoundException e){
 				e.printStackTrace();

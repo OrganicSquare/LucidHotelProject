@@ -45,7 +45,7 @@ public class FileConnector {
 			Object[] fileData = new Object[]{"[false]","[false]"};
 			// Write to a file
 			FileConnector.writeGameFiles(Location,fileData);
-			readGameFiles(Location);
+			fileResponse = readGameFiles(Location);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

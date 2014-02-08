@@ -13,7 +13,7 @@ public class Util {
   }
  }
  public static boolean isValid(String content){
-	 if(content != null && !content.isEmpty() && !content.equals("") && !content.equals("[false]") && content.length() != 0 && content.length() < 500){
+	 if(content != null && !content.isEmpty() && !content.equals("") && !content.equals("[false]") && !content.equals("null") && content.length() != 0 && content.length() < 500){
 		 return true;
 	 } else {
 		 return false;

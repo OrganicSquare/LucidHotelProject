@@ -2,11 +2,16 @@ package game;
 
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +46,7 @@ public class Menu extends JPanel{
 	 JLabel loginUnsuccessfulLBL = new JLabel("Incorrect username or password");
 	 JButton signupBTN = new JButton("Sign up");
 	 JLabel loadingGif = null;
+	 boolean hasTriedLogin = false;
 	 final JPanel loginPane = new JPanel();
 	 Timer timerLogin;
 	 Timer timerUser;
@@ -117,6 +123,12 @@ public class Menu extends JPanel{
 				}
 			}
 		});
+		usernameTF.addActionListener(new ActionListener(){
+			 @Override
+		    public void actionPerformed(ActionEvent ae) {
+				 tryLogin();	
+		    }
+		});
 		loginPane.add(usernameTF);	
 		
 		// generate username button backing
@@ -142,6 +154,12 @@ public class Menu extends JPanel{
 				}
 			}
 		});
+		passwordTF.addActionListener(new ActionListener(){
+			 @Override
+		    public void actionPerformed(ActionEvent ae) {
+				 tryLogin();	
+		    }
+		});
 		loginPane.add(passwordTF);
 		
 		// generate password button backing
@@ -155,14 +173,7 @@ public class Menu extends JPanel{
 		loginButton.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){ 
-				
-				// Show loading bar
-				loadingGif.setVisible(true);
-                loginPane.setVisible(false);
-                
-				InternetConnector.findUser(usernameTF.getText());				
-				asyncCheckLogin(200);
-				
+				tryLogin();				
             }
 		});		
 		loginPane.add(loginButton);
@@ -186,7 +197,21 @@ public class Menu extends JPanel{
 		//signupPane.add(signupBTN);
 		//signupBTN.addActionListener(this);
 		
+		usernameTF.requestFocusInWindow();
 	}
+	public void tryLogin(){
+		if(!hasTriedLogin) {
+			// Show loading bar
+			loadingGif.setVisible(true);
+            loginPane.setVisible(false);
+            
+			InternetConnector.findUser(usernameTF.getText());				
+			asyncCheckLogin(200);
+			hasTriedLogin = true;
+		}
+		
+	}
+	
 	 @Override
 	 protected void paintComponent(Graphics g) {
 	        super.paintComponent(g);
@@ -204,10 +229,11 @@ public class Menu extends JPanel{
 		            	InternetConnector.downloadUserInformation(usernameTF.getText());
 		            	asyncCheckUser(100);						
 					} else {
-						// Show login panel again
+						// Show login panel again since user has incorrect details
 						loginUnsuccessfulLBL.setVisible(true);
 						loadingGif.setVisible(false);
 		                loginPane.setVisible(true);
+		                hasTriedLogin = false;
 					}	            	
 	            	timerLogin.cancel(); 
 	            	
