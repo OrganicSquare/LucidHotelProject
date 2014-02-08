@@ -117,14 +117,14 @@ public class InternetConnector {
 		Map<Integer, Map<String, Object>> ComputationResponse = new HashMap<Integer, Map<String, Object>>();
 		String JSONRaw = JSONRawMain[1];
 		if(JSONRaw.trim().equals("false")){
-			System.out.println("Warning: There are no users currently online");
+			Util.logC("Warning: There are no users currently online");
 			
 			return ComputationResponse;
 		} else {
 			if(!JSONRaw.equals("") && !JSONRaw.equals("true")){
 			Object obj=JSONValue.parse(JSONRaw);
 			JSONArray array=(JSONArray)obj;
-			System.out.println("There are " + array.size() + " users online. Find there data using Map<String, Object> userInfo = otherUserInfo.get(PLAYER_NUMBER);");
+			Util.logC("There are " + array.size() + " users online. Find there data using Map<String, Object> userInfo = otherUserInfo.get(PLAYER_NUMBER);");
 				for (int i = 0; i< array.size(); i++){					
 					Map<String, Object> UserDetails = new HashMap<String, Object>();
 					JSONObject playerDetails=(JSONObject)array.get(i);			

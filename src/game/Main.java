@@ -49,6 +49,7 @@ public class Main{
 	static JPanel mainMenu = new JPanel();
 	static boolean initialisedUserInfo = false, initOtherUserInfo = true;
 	static int playerNum = 0;
+	static float userTurn = 0;
 	
 	static WindowListener listener = new WindowAdapter() {
 		public void windowClosing(WindowEvent w) {
@@ -128,7 +129,10 @@ public class Main{
 				clientUser.drawUser();
 				
 				glLoadIdentity();
+				//cam.setX(clientUser.xPos);
+				//cam.setZ(clientUser.zPos-5);
 				cam.setRotY((float)Vector.angle(clientUser.xPos,clientUser.zPos,cam.getX(),cam.getZ()) + 180);
+				thirdPersonCam(cam);
 				cam.useCam();
 				
 				
@@ -139,6 +143,11 @@ public class Main{
 			Display.update();
 			Display.sync(60);
 		}
+	}
+	public static void thirdPersonCam(Camera cam){
+		cam.setX(clientUser.xPos-(float)(Math.cos((userTurn%100)/100*Math.PI*2)*5));
+		cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
+		clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
 	}
 	
 	private static FloatBuffer asFloatBuffer(float[] values){
@@ -152,7 +161,6 @@ public class Main{
 		initialisedUserInfo = true;
 		clientUser = new Player(userInfo, startingModel);
 	}
-	
 	public static void userInput(Camera cam){
 		float speed = 0.1f;
 		float rotSpeed = 3f;
@@ -165,18 +173,20 @@ public class Main{
 			cam.setZ(cam.getZ() - (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);*/
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)){
-			clientUser.yRot += 3f;
-			System.out.println(clientUser.yRot);
-			/*cam.setX(cam.getX() - (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
-			cam.setZ(cam.getZ() - (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);*/
+			userTurn-= 1f;
+			cam.setX(clientUser.xPos-(float)(Math.cos((userTurn%100)/100*Math.PI*2)*5));
+			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
+			clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_S)){
 			cam.setX(cam.getX() - (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
 			cam.setZ(cam.getZ() + (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_D)){
-			clientUser.yRot -= 3f;
-			System.out.println(clientUser.yRot);
+			userTurn+= 1f;
+			cam.setX(clientUser.xPos-(float)(Math.cos((userTurn%100)/100*Math.PI*2)*5));
+			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
+			clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
 		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_LEFT)){
