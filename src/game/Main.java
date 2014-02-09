@@ -185,7 +185,7 @@ public class Main{
 			userTurn-= 1f;
 			cam.setX(clientUser.xPos-(float)(Math.cos((userTurn%100)/100*Math.PI*2)*5));
 			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
-			clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
+			userInfo.put("rotY", (float)userInfo.get("rotY") + 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos));
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_S) && !initOtherUserInfo){
 			userInfo.put("xPos", (float)userInfo.get("xPos")-(float)Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed);
@@ -198,7 +198,7 @@ public class Main{
 			userTurn+= 1f;
 			cam.setX(clientUser.xPos-(float)(Math.cos((userTurn%100)/100*Math.PI*2)*5));
 			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
-			clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
+			userInfo.put("rotY", (float)userInfo.get("rotY") + 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos));
 		}
 		if(!Keyboard.isKeyDown(Keyboard.KEY_W) && !Keyboard.isKeyDown(Keyboard.KEY_S) && !initOtherUserInfo){
 			clientUser.isMoving = false;
