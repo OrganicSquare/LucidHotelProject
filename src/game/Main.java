@@ -135,6 +135,9 @@ public class Main{
 					clientUser.setModel(standingMan);
 				}
 				clientUser.drawUser();
+				System.out.println("X: " + clientUser.xPos);
+				System.out.println("Y: " + clientUser.yPos);
+				System.out.println("Z: " + clientUser.zPos);
 				
 				glLoadIdentity();
 				//cam.setX(clientUser.xPos);
@@ -142,8 +145,6 @@ public class Main{
 				cam.setRotY((float)Vector.angle(clientUser.xPos,clientUser.zPos,cam.getX(),cam.getZ()) + 180);
 				thirdPersonCam(cam);
 				cam.useCam();
-				
-				
 				
 				
 				drawAxis();
@@ -174,6 +175,8 @@ public class Main{
 		float rotSpeed = 3f;
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_W) && !initOtherUserInfo){
+			userInfo.put("xPos", (float)userInfo.get("xPos")+(float)Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed);
+			userInfo.put("zPos", (float)userInfo.get("zPos")+(float)Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed);
 			clientUser.xPos += Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.zPos += Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.isMoving = true;
@@ -185,8 +188,10 @@ public class Main{
 			clientUser.yRot = 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_S) && !initOtherUserInfo){
-			cam.setX(cam.getX() - (float)Math.sin(Math.toRadians(cam.getRotY()))*speed);
-			cam.setZ(cam.getZ() + (float)Math.cos(Math.toRadians(cam.getRotY()))*speed);
+			userInfo.put("xPos", (float)userInfo.get("xPos")-(float)Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed);
+			userInfo.put("zPos", (float)userInfo.get("zPos")-(float)Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed);
+			clientUser.xPos -= Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed;
+			clientUser.zPos -= Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.isMoving = true;
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_D)){
