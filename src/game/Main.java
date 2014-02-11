@@ -102,10 +102,10 @@ public class Main{
 						for(int i = 0; i < otherUserInfo.size(); i++){
 							Map<String, Object> userInfoOnline = otherUserInfo.get(i);
 							try{
-							player[i].xPos = (float)userInfoOnline.get("xPos");
-							player[i].yPos = (float)userInfoOnline.get("yPos");
-							player[i].zPos = (float)userInfoOnline.get("zPos");
-							player[i].yRot = (float)userInfoOnline.get("rotY");
+							player[i].xPos = (Float)userInfoOnline.get("xPos");
+							player[i].yPos = (Float)userInfoOnline.get("yPos");
+							player[i].zPos = (Float)userInfoOnline.get("zPos");
+							player[i].yRot = (Float)userInfoOnline.get("rotY");
 							}
 							catch(Exception e){
 								e.printStackTrace();
@@ -117,7 +117,7 @@ public class Main{
 					InternetConnector.downloadAllUserPositions((Integer)userInfo.get("uId"));
 					
 					// Send user data
-					InternetConnector.sendUserPosition((int)userInfo.get("uId"),new float[]{(float)userInfo.get("xPos"),(float)userInfo.get("yPos"),(float)userInfo.get("zPos"),(float)userInfo.get("rotY"),1});
+					InternetConnector.sendUserPosition((Integer)userInfo.get("uId"),new float[]{(Float)userInfo.get("xPos"),(Float)userInfo.get("yPos"),(Float)userInfo.get("zPos"),(Float)userInfo.get("rotY"),1});
 					
 					// Will reset the delay
 					SYNC_DELAY = 0;
@@ -175,8 +175,8 @@ public class Main{
 		float rotSpeed = 3f;
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_W) && !initOtherUserInfo){
-			userInfo.put("xPos", (float)userInfo.get("xPos")+(float)Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed);
-			userInfo.put("zPos", (float)userInfo.get("zPos")+(float)Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed);
+			userInfo.put("xPos", (Float)userInfo.get("xPos")+(float)Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed);
+			userInfo.put("zPos", (Float)userInfo.get("zPos")+(float)Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed);
 			clientUser.xPos += Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.zPos += Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.isMoving = true;
@@ -185,11 +185,11 @@ public class Main{
 			userTurn-= 1f;
 			cam.setX(clientUser.xPos-(float)(Math.cos((userTurn%100)/100*Math.PI*2)*5));
 			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
-			userInfo.put("rotY", (float)userInfo.get("rotY") + 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos));
+			userInfo.put("rotY", (Float)userInfo.get("rotY") + 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos));
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_S) && !initOtherUserInfo){
-			userInfo.put("xPos", (float)userInfo.get("xPos")-(float)Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed);
-			userInfo.put("zPos", (float)userInfo.get("zPos")-(float)Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed);
+			userInfo.put("xPos", (Float)userInfo.get("xPos")-(float)Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed);
+			userInfo.put("zPos", (Float)userInfo.get("zPos")-(float)Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed);
 			clientUser.xPos -= Math.sin(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.zPos -= Math.cos(Math.toRadians(clientUser.yRot))*clientUser.speed;
 			clientUser.isMoving = true;
@@ -198,7 +198,7 @@ public class Main{
 			userTurn+= 1f;
 			cam.setX(clientUser.xPos-(float)(Math.cos((userTurn%100)/100*Math.PI*2)*5));
 			cam.setZ(clientUser.zPos-(float)(Math.sin((userTurn%100)/100*Math.PI*2)*5));
-			userInfo.put("rotY", (float)userInfo.get("rotY") + 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos));
+			userInfo.put("rotY", (Float)userInfo.get("rotY") + 180-(float)Vector.angle(cam.getX(),cam.getZ(),clientUser.xPos,clientUser.zPos));
 		}
 		if(!Keyboard.isKeyDown(Keyboard.KEY_W) && !Keyboard.isKeyDown(Keyboard.KEY_S) && !initOtherUserInfo){
 			clientUser.isMoving = false;
