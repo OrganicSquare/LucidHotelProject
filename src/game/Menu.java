@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -29,7 +28,7 @@ import javax.swing.JTextField;
 
 import communication.FileConnector;
 import communication.InternetConnector;
-import communication.Util;
+import entities.Entites;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -50,6 +49,8 @@ public class Menu extends JPanel{
 	 final JPanel loginPane = new JPanel();
 	 Timer timerLogin;
 	 Timer timerUser;
+	 
+	 // Two key details that determine when the loading is complete
 	 
 	public Menu(){		
 		// Set up areas
@@ -253,19 +254,28 @@ public class Menu extends JPanel{
 	            	// The user is ok to log in
 	            	
 	            	// Save details to file
-	            	
-	            	// Create data to write to file
-	    			String username = usernameTF.getText();
-	    			String password = passwordTF.getText();
-	    			Object[] fileData = new Object[]{username,password};
-	    			// Write to a file
-	    			FileConnector.writeGameFiles("userDetails.dat",fileData);
-	            	
+		            	// Create data to write to file
+		    			String username = usernameTF.getText();
+		    			String password = passwordTF.getText();
+		    			Object[] fileData = new Object[]{username,password};
+		    			// Write to a file
+		    			FileConnector.writeGameFiles("userDetails.dat",fileData);
+		    			
+	            	// Update vars
+		    			Main.loginSuccessful = true;
+		    		// Decode the users information
+		    			Map<String, Object> UserInfoFromNet = InternetConnector.decodeUserInformation();
+		            	Main.userInfo = UserInfoFromNet;
+		            // Initiate the creation of the players
+		            	Main.initiateOtherUserInfo(); 
+		            	Entites.loadPlayer();
+		            	Main.initUserInfo(Entites.standingPlayer);
+		    			
+		    			
 	            	// Show GUI
-	            	Main.loginSuccessful = true;
-	            	Map<String, Object> UserInfoFromNet = InternetConnector.decodeUserInformation();
-	            	Main.userInfo = UserInfoFromNet;
 	            	Main.lwjglCanvas.setVisible(true);
+	            	
+	            	// Clean up any used timers
 	            	timerUser.cancel(); 	            	
 	            } else {
 	            	asyncCheckUser(100);	            	

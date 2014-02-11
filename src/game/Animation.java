@@ -35,6 +35,7 @@ public class Animation{
 			glNewList(model[i], GL_COMPILE);
 			Model m = null;
 			try{
+				
 				m = OBJLoader.loadModel(new File("res" + File.separator+dir+File.separator+filename+"_"+String.format("%06d", i+start-1)+".obj"));
 				System.out.println("Loading: " + i);
 				System.out.println(("res"+File.separator+dir+File.separator+filename+"_"+String.format("%06d", i+start-1)+".obj"));
@@ -84,7 +85,7 @@ public class Animation{
 				System.out.println(("res"+File.separator+dir+File.separator+filename+"_"+String.format("%06d", i+start-1)+".obj"));
 				if(i == 38){
 					
-					communication.Util.logC("Loading Finished");
+					game.Util.logC("Loading Finished");
 				}
 			}
 			catch(FileNotFoundException e){

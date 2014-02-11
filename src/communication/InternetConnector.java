@@ -1,9 +1,9 @@
 package communication;
 
 import game.Main;
+import game.Util;
 
 import java.io.BufferedReader;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +27,6 @@ import java.util.concurrent.Future;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.fluent.Async;
 import org.apache.http.client.fluent.Content;
@@ -36,7 +34,6 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.concurrent.FutureCallback;
 
-import communication.Util;
 import java.util.Timer;
 import java.util.TimerTask;
 
