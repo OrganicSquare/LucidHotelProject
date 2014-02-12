@@ -18,6 +18,8 @@ import java.io.IOException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Entites;
+
 public class Animation{
 	String directory, fileName;
 	int start, end, animationlength;
@@ -86,6 +88,7 @@ public class Animation{
 				if(i == 38){
 					
 					game.Util.logC("Loading Finished");
+					Entites.hasEntitesFinished = true;
 				}
 			}
 			catch(FileNotFoundException e){

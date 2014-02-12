@@ -28,6 +28,7 @@ import javax.swing.JTextField;
 
 import communication.FileConnector;
 import communication.InternetConnector;
+import communication.Timers;
 import entities.Entites;
 
 import java.awt.event.FocusEvent;
@@ -40,17 +41,21 @@ public class Menu extends JPanel{
 	 private BufferedImage image;	 
 	 JLabel usernameLBL = new JLabel("Username");
 	 JLabel passwordLBL = new JLabel("Password");
-	 JTextField usernameTF = new JTextField();
-	 JTextField passwordTF = new JPasswordField();
-	 JLabel loginUnsuccessfulLBL = new JLabel("Incorrect username or password");
+	 static JTextField usernameTF = new JTextField();
+	 static JTextField passwordTF = new JPasswordField();
+	 static JLabel loginUnsuccessfulLBL = new JLabel("Incorrect username or password");
 	 JButton signupBTN = new JButton("Sign up");
-	 JLabel loadingGif = null;
-	 boolean hasTriedLogin = false;
-	 final JPanel loginPane = new JPanel();
+	 static JLabel loadingGif = null;
+	 static boolean hasTriedLogin = false;
+	 final static JPanel loginPane = new JPanel();
 	 Timer timerLogin;
 	 Timer timerUser;
 	 
-	 // Two key details that determine when the loading is complete
+	 // Two key Flags that determine when the loading is complete
+	 public static boolean hasDetailsDownloaded = false;
+	 public static boolean hasModelsLoaded = false;
+	 	// When both flags are true then the main.java is loaded in
+	 
 	 
 	public Menu(){		
 		// Set up areas
@@ -199,6 +204,16 @@ public class Menu extends JPanel{
 		//signupBTN.addActionListener(this);
 		
 		usernameTF.requestFocusInWindow();
+
+		// Start Flag checking
+    	Timers.initiateTimer4(2000,Timers.timerThread4, 4);
+		
+		// Start Model Loading checking
+    	Timers.initiateTimer3(200,Timers.timerThread3, 3);
+		
+		
+		
+		
 	}
 	public void tryLogin(){
 		if(!hasTriedLogin) {
@@ -207,7 +222,9 @@ public class Menu extends JPanel{
             loginPane.setVisible(false);
             
 			InternetConnector.findUser(usernameTF.getText());				
-			asyncCheckLogin(200);
+			
+        	Timers.initiateTimer1(100,Timers.timerThread1, 1);
+			
 			hasTriedLogin = true;
 		}
 		
@@ -218,69 +235,77 @@ public class Menu extends JPanel{
 	        super.paintComponent(g);
 	        g.drawImage(image, 0, 0, null);           
 	  }
-	 public void asyncCheckLogin(int seconds) {
-		 	timerLogin = new Timer();
-		 	timerLogin.schedule(new initialDownloadCompleteLogin(), seconds);
-		}
-	 class initialDownloadCompleteLogin extends TimerTask {
-	        public void run() {
-	            if(Util.isValid(InternetConnector.JSONRawMain[1])){	            	
-	            	if(InternetConnector.isLoginOK(passwordTF.getText())){	            
-	            		InternetConnector.excutePostAsync(new String[]{"target","userName"}, new String[]{"logUserIn",usernameTF.getText()}, 0);
-		            	InternetConnector.downloadUserInformation(usernameTF.getText());
-		            	asyncCheckUser(100);						
-					} else {
-						// Show login panel again since user has incorrect details
-						loginUnsuccessfulLBL.setVisible(true);
-						loadingGif.setVisible(false);
-		                loginPane.setVisible(true);
-		                hasTriedLogin = false;
-					}	            	
-	            	timerLogin.cancel(); 
-	            	
-	            } else {
-	            	asyncCheckLogin(200);
-	            }
-	        }
-	    }
 	 
-	 public void asyncCheckUser(int seconds) {
-	        timerUser = new Timer();
-	        timerUser.schedule(new initialDownloadCompleteUser(), seconds);
-		}
-	 class initialDownloadCompleteUser extends TimerTask {
-	        public void run() {
-	            if(Util.isValid(InternetConnector.JSONRawMain[1])){	            	
-	            	// The user is ok to log in
+	 
+	 // TIMER CLASSES
+	 public static boolean checkUserLoginIsOk(){ // CODE 1
+		 if(Util.isValid(InternetConnector.JSONRawMain[1])){	            	
+         	if(InternetConnector.isLoginOK(passwordTF.getText())){	            
+         		InternetConnector.excutePostAsync(new String[]{"target","userName"}, new String[]{"logUserIn",usernameTF.getText()}, 0);
+	            	InternetConnector.downloadUserInformation(usernameTF.getText());
 	            	
-	            	// Save details to file
-		            	// Create data to write to file
-		    			String username = usernameTF.getText();
-		    			String password = passwordTF.getText();
-		    			Object[] fileData = new Object[]{username,password};
-		    			// Write to a file
-		    			FileConnector.writeGameFiles("userDetails.dat",fileData);
-		    			
-	            	// Update vars
-		    			Main.loginSuccessful = true;
-		    		// Decode the users information
-		    			Map<String, Object> UserInfoFromNet = InternetConnector.decodeUserInformation();
-		            	Main.userInfo = UserInfoFromNet;
-		            // Initiate the creation of the players
-		            	Main.initiateOtherUserInfo(); 
-		            	Entites.loadPlayer();
-		            	Main.initUserInfo(Entites.standingPlayer);
-		    			
-		    			
-	            	// Show GUI
-	            	Main.lwjglCanvas.setVisible(true);
-	            	
-	            	// Clean up any used timers
-	            	timerUser.cancel(); 	            	
-	            } else {
-	            	asyncCheckUser(100);	            	
-	            }
-	        }
-	    }
+	            	// Details ok, start second operations
+	            	Timers.initiateTime2(100,Timers.timerThread2, 2);						
+				} else {
+					// Show login panel again since user has incorrect details
+					loginUnsuccessfulLBL.setVisible(true);
+					loadingGif.setVisible(false);
+	                loginPane.setVisible(true);
+	                hasTriedLogin = false;
+				}	            	
+         	return true;
+         } else {
+         	return false;
+         }
+	 }
+	 static public boolean checkUserDetailsDownloaded(){ // CODE 2
+		 if(Util.isValid(InternetConnector.JSONRawMain[1])){        
+			 System.out.println("Downloaded all data");
+         	// Save details to file
+	            	// Create data to write to file
+	    			String username = usernameTF.getText();
+	    			String password = passwordTF.getText();
+	    			Object[] fileData = new Object[]{username,password};
+	    			// Write to a file
+	    			FileConnector.writeGameFiles("userDetails.dat",fileData);
+	    			
+	    		// Decode the users information
+	    			Map<String, Object> UserInfoFromNet = InternetConnector.decodeUserInformation();
+	            	Main.userInfo = UserInfoFromNet;
+	            // Initiate the creation of the players
+	            	Main.initiateOtherUserInfo(); 
+	            	Main.initUserInfo(Entites.standingPlayer);
+	    			
+	            // Update flags
+	            	hasDetailsDownloaded = true;
+         	
+         	return true;	            	
+         } else {
+         	return false;	            	
+         }
+	 }
+	 static public void checkModelsHaveLoaded(){ // Code 3
+		 if(Entites.hasEntitesFinished){
+			 hasModelsLoaded = true;
+			 System.out.println("Models finished");
+		 } else {
+			 Timers.initiateTimer3(200,Timers.timerThread3, 3);
+		 }
+	 }
+	 static public void checkAndRunAllFlagsAccepted(){ // Code 4
+		 if(hasModelsLoaded && hasDetailsDownloaded){
+			 
+			 System.out.println("Ready to play game");
+			 // Loading is complete 
+			 // Show GUI
+				 Main.lwjglCanvas.setVisible(true);
+				 Main.loginSuccessful = true;
+				 
+				 
+			// This is menu's end state. Everything is full loaded and ready - now the menu.java opens
+		 } else {
+			 Timers.initiateTimer4(200,Timers.timerThread4, 4);
+		 }
+	 }
 	 
 }

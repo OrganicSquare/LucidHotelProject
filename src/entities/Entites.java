@@ -6,6 +6,7 @@ public class Entites {
 	// Player Animations
 	public static Animation standingPlayer = null;
 	public static Animation walkingPlayer = null;
+	public static boolean hasEntitesFinished = false;
 	public static void main(String args[]){
 		
 	}

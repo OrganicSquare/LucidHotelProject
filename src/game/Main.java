@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.*;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.*;
@@ -55,7 +56,7 @@ public class Main{
 		cam.setZ(10);
 		cam.setY(3);
 		Entites.loadPlayer();
-		/*
+		
 		while(!Display.isCloseRequested() && !windowClosed){
 			if(loginSuccessful){
 				UserInput.update(cam);
@@ -117,12 +118,27 @@ public class Main{
 			}
 			Display.update();
 			Display.sync(60);
-		}*/
+		}
 	}
 	// Called once from menu.java to create the other players on the server.
 	public static void initiateOtherUserInfo(){
+		/*
+		System.out.println(otherUserInfo);
 		for(int i = 0; i < otherUserInfo.size(); i++){
 			Map<String, Object> userInfoOnline = otherUserInfo.get(i);
+			player[i] = new Player(userInfoOnline, Entites.standingPlayer);
+			playerNum++;
+		}
+		*/
+		for(int i = 0; i < 2; i++){
+			Map<String, Object> userInfoOnline = new HashMap<String, Object>();
+			userInfoOnline.put("uId", 1);
+			userInfoOnline.put("uSkin", "red");
+			userInfoOnline.put("xPos", 10.0f);
+			userInfoOnline.put("yPos", 10.0f);
+			userInfoOnline.put("zPos", 10.0f);
+			userInfoOnline.put("rotY", 10.0f);
+			
 			player[i] = new Player(userInfoOnline, Entites.standingPlayer);
 			playerNum++;
 		}
