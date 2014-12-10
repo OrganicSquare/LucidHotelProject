@@ -23,7 +23,7 @@ public class Main{
 	static int HEIGHT = 675;
 	static final int MAX_PLAYERS = 8;
 	static int SYNC_DELAY = 0;
-	static final int SYNC_DELAY_MAX = 5;
+	static final int SYNC_DELAY_MAX = 45;
 	
 	static Map<String, Object> userInfo;
 	static Player clientUser;
@@ -83,7 +83,7 @@ public class Main{
 						InternetConnector.downloadAllUserPositions((Integer)userInfo.get("uId"));
 					
 					// Send the users position data
-					InternetConnector.sendUserPosition((Integer)userInfo.get("uId"),new float[]{(Float)userInfo.get("xPos"),(Float)userInfo.get("yPos"),(Float)userInfo.get("zPos"),(Float)userInfo.get("rotY"),1});
+					//InternetConnector.sendUserPosition((Integer)userInfo.get("uId"),new float[]{(Float)userInfo.get("xPos"),(Float)userInfo.get("yPos"),(Float)userInfo.get("zPos"),(Float)userInfo.get("rotY"),1});
 					
 					// Will reset the delay
 					SYNC_DELAY = 0;
@@ -97,12 +97,12 @@ public class Main{
 				}
 				
 				// Animate the user
-				if(clientUser.isMoving){
+				/*if(clientUser.isMoving){
 					clientUser.setModel(Entites.walkingPlayer);
 				}
 				else{
 					clientUser.setModel(Entites.standingPlayer);
-				}
+				}*/
 				// Draw the user
 				clientUser.drawUser();
 				

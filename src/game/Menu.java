@@ -220,7 +220,6 @@ public class Menu extends JPanel{
 			// Show loading bar
 			loadingGif.setVisible(true);
             loginPane.setVisible(false);
-            
 			InternetConnector.findUser(usernameTF.getText());				
 			
         	Timers.initiateTimer1(100,Timers.timerThread1, 1);
@@ -260,7 +259,7 @@ public class Menu extends JPanel{
 	 }
 	 static public boolean checkUserDetailsDownloaded(){ // CODE 2
 		 if(Util.isValid(InternetConnector.JSONRawMain[1])){        
-			 System.out.println("Downloaded all data");
+			 System.out.println("Downloaded all data woo");
          	// Save details to file
 	            	// Create data to write to file
 	    			String username = usernameTF.getText();
@@ -272,6 +271,7 @@ public class Menu extends JPanel{
 	    		// Decode the users information
 	    			Map<String, Object> UserInfoFromNet = InternetConnector.decodeUserInformation();
 	            	Main.userInfo = UserInfoFromNet;
+	            	
 	            // Initiate the creation of the players
 	            	Main.initiateOtherUserInfo(); 
 	            	Main.initUserInfo(Entites.standingPlayer);

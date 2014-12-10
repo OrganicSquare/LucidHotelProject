@@ -170,7 +170,6 @@ public class InternetConnector {
 		JSONRawMain[1] = "";
 		JSONArray array=(JSONArray)obj;
 		JSONObject playerDetails=(JSONObject)array.get(0);			
-		
 		ComputationResponse.put("uId", Integer.parseInt(playerDetails.get("uId").toString()));
 		ComputationResponse.put("uSkin", playerDetails.get("skin").toString());
 		ComputationResponse.put("xPos", Float.parseFloat(playerDetails.get("xPos").toString()));
